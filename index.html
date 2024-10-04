@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date & Time</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Verifique a hora em uma Cidade e País</h1>
+
+    <label for="cidade">Cidade:</label>
+    <input type="text" id="cidade" name="cidade" placeholder="Digite uma cidade">
+    
+    <label for="pais">País:</label>
+    <input type="text" id="pais" name="pais" placeholder="Digite um país">
+    
+    <button id="buscar">Buscar Horário</button>
+
+    <p id="resultado"></p>
+
+    <script>
+        document.getElementById("buscar").addEventListener("click", function() {
+            const cidade = document.getElementById("cidade").value;
+            const pais = document.getElementById("pais").value;
+            const apiKey = '4f4c4e9bc7e647c09c9ece5e162710d8';
+
+
+            if (cidade && pais) {
+                fetch(`https://api.opencagedata.com/geocode/v1/json?q=${cidade}+${pais}&key=${apiKey}&language=pt&pretty=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results.length > 0) {
+                        const resultado = data.results[0];
+                        const { lat, lng } = resultado.geometry;
+                        const timezone = resultado.annotations.timezone.name;
+
+                        
+                        const agora = new Date().toLocaleString("pt-BR", { timeZone: timezone });
+                        
+                        
+                        document.getElementById("resultado").innerText = `Horário em ${cidade}, ${pais}: ${agora}`;
+                    } else {
+                        document.getElementById("resultado").innerText = "Local não encontrado. Verifique a cidade e o país.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na API:", error);
+                    document.getElementById("resultado").innerText = "Erro ao buscar a localização.";
+                });
+            } else {
+                document.getElementById("resultado").innerText = "Por favor, insira uma cidade e um país.";
+            }
+        });
+    </script>
+</body>
+</html>
+
